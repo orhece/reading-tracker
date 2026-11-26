@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="app-version" content="4">
+<meta name="app-version" content="5">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>reading tracker</title>
 <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
@@ -30,7 +30,10 @@ html{background:var(--bg);scroll-padding-top:var(--top)}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.45 -apple-system,system-ui,sans-serif;-webkit-text-size-adjust:100%;text-transform:capitalize}
 button,input,select{text-transform:capitalize}
 ::selection{background:var(--accent);color:#000}
-main{max-width:560px;margin:0 auto;padding:var(--top) 16px calc(110px + env(safe-area-inset-bottom))}
+main{max-width:560px;margin:0 auto;padding:var(--top) 16px calc(100px + env(safe-area-inset-bottom));min-height:100vh;min-height:100dvh;display:flex;flex-direction:column}
+[role=tabpanel]:not([hidden]){flex:1;display:flex;flex-direction:column}
+/* the main card on each tab fills the space down to the tab bar, so every tab's card is the same size */
+#vH>.logp,#vT>.checkin,#vL>.plan,#vS>.checkin:first-child{flex:1;margin-top:0}
 h1{font-size:30px;line-height:1.15;margin:0 0 12px;font-weight:700}
 h1+.sub{margin:-10px 0 12px}
 .sub{color:var(--mute);margin:0 0 16px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -119,17 +122,15 @@ dd small,dt small{display:block;font-weight:400;color:var(--mute);font-size:12px
 
 /* log panel */
 .logp{text-align:left}
-.lphead{font-weight:700;margin:0 0 4px}
+.lphead{font-size:19px;font-weight:700;margin:0 0 6px;line-height:1.3}
 .lpq{margin:0 0 4px;font-size:15px;color:var(--mute)}
 .lpbig{display:flex;justify-content:flex-start;align-items:baseline;gap:4px;margin:6px 0}
 .lpbig input{width:5.5ch;font:inherit;font-size:3rem;font-weight:700;text-align:left;background:transparent;border:0;border-bottom:2px solid var(--line);border-radius:0;color:var(--accent-ink);padding:0}
 .lpbig input.pctin{width:4.5ch}
 .lpbig span{font-size:1.6rem;color:var(--accent-ink)}
-.lpbtns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
-.lpbtns button{padding:10px 0}
-.logp #lpgoal{margin-top:6px}
 .logp #lpsave{width:100%;margin-top:12px;padding:12px 0;font-size:17px}
-.logp #syncW{width:100%;margin-top:8px;padding:12px 0;font-size:17px}
+.logp #syncW{display:inline-flex;align-items:center;gap:6px;margin-top:6px}
+.logp #syncW svg{width:16px;height:16px}
 .logp #lpcancel{width:100%;margin-top:8px;padding:13px 0;font-size:17px}
 
 /* shelf */
@@ -169,6 +170,13 @@ input[type="file"]{margin-top:10px;font-size:14px;padding:8px 0;text-transform:n
 /* toast */
 .topbar{display:flex;justify-content:space-between;align-items:center;min-height:36px;margin-bottom:6px}
 .topbar .seg{margin:0}
+.rgrp{display:flex;gap:8px;width:210px}
+.rgrp>#topSeg{flex:1;display:flex}
+.rgrp>#topSeg[hidden]{display:none}
+.rgrp .seg{display:grid;width:100%;height:36px}
+.rgrp .seg button{padding:0;font-size:15px}
+.topbar .btn.sm,.sbar .btn.sm{height:36px;width:101px;padding:0;font-size:15px;white-space:nowrap}
+.rgrp .btn.sm{width:auto;flex:1}
 .btn.sm{padding:7px 14px;font-size:15px}
 body.modal{overflow:hidden}
 .sheet{position:fixed;inset:0;background:var(--bg);overflow-y:auto;overscroll-behavior:contain;padding:var(--top) 0 calc(24px + env(safe-area-inset-bottom));display:none;z-index:20}
@@ -182,7 +190,7 @@ body.modal{overflow:hidden}
 </head>
 <body>
 <main>
-  <div class="topbar"><span><button type="button" class="btn sm" id="setBtn" hidden>settings</button></span><span><span id="topSeg"></span><button type="button" class="btn sm" id="newBtn" data-act="new" hidden>new book +</button></span></div>
+  <div class="topbar"><span><button type="button" class="btn sm" id="setBtn" hidden>settings</button></span><span class="rgrp"><span id="topSeg"></span><button type="button" class="btn sm" id="newBtn" data-act="new" hidden>new book +</button><button type="button" class="btn sm" id="finBtn" hidden>finished</button></span></div>
   <h1>Reading tracker</h1>
   <p class="sub" id="bt" hidden></p>
   <nav class="tabs" role="tablist" aria-label="sections">
@@ -198,10 +206,8 @@ body.modal{overflow:hidden}
     <p class="lpq" id="lpq">what page did you end at?</p>
     <div class="lpbig"><span id="lpPre">p.</span><input id="lpv" type="number" inputmode="numeric" step="1" min="0" aria-label="page you ended at"><span id="lpSuf" hidden>%</span></div>
     <p class="lpq" id="lppct"></p>
-    <button type="button" id="lpgoal"></button>
-    <div class="lpbtns"><button type="button" data-d="-1">-1</button><button type="button" data-d="1">+1</button><button type="button" data-d="10">+10</button><button type="button" data-d="25">+25</button></div>
+    <button type="button" id="syncW" hidden>widget<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><path d="M20 4v5h-5"/></svg></button>
     <button type="button" id="lpsave">save progress</button>
-    <button type="button" id="syncW" hidden>update widget</button>
     <button type="button" id="lpcancel" hidden>cancel</button>
   </section>
   <section class="checkin" id="homeEmpty" hidden>
@@ -227,10 +233,6 @@ body.modal{overflow:hidden}
     <h2>reading now</h2>
     <div id="shNow"></div>
   </section>
-  <section class="checkin" id="shDoneWrap" hidden>
-    <h2 class="fold" id="doneH"><span>finished <span class="count" id="doneN"></span></span><i class="chev">›</i></h2>
-    <div id="shDone" hidden></div>
-  </section>
   <div id="setHold" hidden><div id="setupWrap" class="setup" hidden>
   <form id="f" onsubmit="return false" novalidate>
     <label class="full">Book title
@@ -255,6 +257,11 @@ body.modal{overflow:hidden}
   </div></div>
   </div>
 </main>
+
+<div class="sheet" id="finSheet" role="dialog" aria-label="finished books">
+  <div class="sbar"><span></span><b>finished</b><button type="button" class="btn sm" id="finDone">done</button></div>
+  <div class="inner"><section class="checkin"><div id="shDone"></div></section></div>
+</div>
 
 <div class="sheet" id="setSheet" role="dialog" aria-label="settings">
   <div class="sbar"><span></span><b>settings</b><button type="button" class="btn sm" id="setDone">done</button></div>
@@ -413,9 +420,6 @@ body.modal{overflow:hidden}
     inp.step="1";inp.inputMode="numeric";inp.classList.toggle("pctin",pc);
     inp.setAttribute("aria-label",pc?"percent of the book you’re at":"page you ended at");
     var steps=pc?[-1,1,5,10]:[-1,1,10,25];
-    [].forEach.call(document.querySelectorAll(".lpbtns button"),function(b,i){b.dataset.d=steps[i];b.textContent=(steps[i]>0?"+":"")+steps[i]+(pc?"%":"")});
-    $("lpgoal").textContent="goal ("+spot(ctx.goalPg)+")";
-    $("lpgoal").hidden=!isT||ctx.done;
     $("lpcancel").hidden=isT;
     if(document.activeElement!==inp&&!lpDirty){lpPin=pageFor(k);inp.value=toUnit(lpPin)}
     updPct();
@@ -587,13 +591,12 @@ body.modal{overflow:hidden}
     return '<div class="bk'+(isC?' cur" data-cur="1':'')+'"><div class="bkm"'+(isC?' data-setup="1"':'')+'><div class="t"><span class="tn">'+esc(name)+'</span>'+(isC?'<span class="tag">open</span><i class="chev'+(setupOpen?' on':'')+'">›</i>':'')+'</div><div class="s">'+s+'</div></div><div class="acts">'+
       (isC?'':'<button type="button" data-open="'+b.id+'">open</button>')+'<button type="button" data-del="'+b.id+'" aria-label="delete '+esc(name)+'">delete</button></div></div>';
   }
-  var setupOpen=false,doneOpen=false;
-  try{doneOpen=localStorage.getItem(KEY+".doneOpen")==="1"}catch(e){}
+  var setupOpen=false;
   function renderShelf(){
     var wrap=$("setupWrap");
     /* while typing in the book's setup, only refresh its row so the keyboard stays up */
     if(wrap.contains(document.activeElement)){
-      var old=document.querySelector("#vS [data-cur]"),cb=curBook();
+      var old=document.querySelector("[data-cur]"),cb=curBook();
       if(old&&cb){var tmp=document.createElement("div");tmp.innerHTML=row(cb);old.replaceWith(tmp.firstChild)}
       return;
     }
@@ -602,11 +605,8 @@ body.modal{overflow:hidden}
     shelf.books.forEach(function(b){var st=analyze(b);(st&&st.done?done:reading).push({b:b,k:st&&st.finK||""})});
     $("shNow").innerHTML=reading.length?reading.map(function(x){return row(x.b)}).join(""):'<p class="hint">nothing in progress right now.</p>';
     done.sort(function(a,b){return a.k<b.k?1:-1});
-    $("shDoneWrap").hidden=!done.length;
-    $("shDone").innerHTML=done.map(function(x){return row(x.b)}).join("");
-    $("doneN").textContent="("+done.length+")";
-    $("shDone").hidden=!doneOpen;$("doneH").classList.toggle("open",doneOpen);
-    var cr=document.querySelector("#vS [data-cur]");
+    $("shDone").innerHTML=done.length?done.map(function(x){return row(x.b)}).join(""):'<p class="hint" style="margin:0">no finished books yet.</p>';
+    var cr=document.querySelector("[data-cur]");
     if(cr&&setupOpen)cr.after(wrap);
     wrap.hidden=!setupOpen||!cr;
     $("bkInfo").textContent=shelf.lastBackup?"last backup: "+longD(pd(shelf.lastBackup))+".":"no backup yet. a backup keeps your books safe if this browser’s data gets cleared or you switch phones.";
@@ -730,7 +730,6 @@ body.modal{overflow:hidden}
   $("logp").addEventListener("click",function(e){
     var b=e.target.closest("button");if(!b||!ctx)return;
     if(b.dataset.d)lpSet((parseFloat($("lpv").value)||0)+Number(b.dataset.d));
-    else if(b.id==="lpgoal"){lpSet(toUnit(ctx.goalPg));lpPin=ctx.goalPg;updPct()}
     else if(b.id==="lpcancel"){editKey="";lpDirty=false;render()}
     else if(b.id==="lpsave")saveLp();
   });
@@ -739,13 +738,15 @@ body.modal{overflow:hidden}
     editKey=c.dataset.k;lpDirty=false;render();
     tab("H");window.scrollTo(0,0);
   });
-  $("vS").addEventListener("click",function(e){
+  function closeSheets(){["finSheet","setSheet"].forEach(function(id){$(id).classList.remove("open")});document.body.classList.remove("modal")}
+  function shelfClick(e){
     if(e.target.closest("[data-setup]")){toggleSetup();return}
-    if(e.target.closest("#doneH")){doneOpen=!doneOpen;try{localStorage.setItem(KEY+".doneOpen",doneOpen?"1":"0")}catch(x){}renderShelf();return}
     var b=e.target.closest("[data-open],[data-del]");if(!b)return;
-    if(b.dataset.open)openBook(b.dataset.open);
+    if(b.dataset.open){closeSheets();openBook(b.dataset.open)}
     else if(armed(b,"sure?"))delBook(b.dataset.del);
-  });
+  }
+  $("vS").addEventListener("click",shelfClick);
+  $("finSheet").addEventListener("click",shelfClick);
   function setUnit(u){
     if(u===unit)return;
     var pg=lpDirty&&ctx?(lpPin!=null?lpPin:lpPage()):NaN;
@@ -766,7 +767,7 @@ body.modal{overflow:hidden}
   function updTop(){
     $("setBtn").hidden=curTab!=="H";
     $("topSeg").hidden=!(curTab==="H"||curTab==="T"||curTab==="L");
-    $("newBtn").hidden=curTab!=="S";
+    $("newBtn").hidden=curTab!=="S";$("finBtn").hidden=curTab!=="S";
   }
   function tab(n){
     curTab=n;updTop();
@@ -789,7 +790,9 @@ body.modal{overflow:hidden}
 
   /* settings sheet */
   $("setBtn").addEventListener("click",function(){$("setSheet").classList.add("open");$("setSheet").scrollTop=0;document.body.classList.add("modal")});
-  $("setDone").addEventListener("click",function(){$("setSheet").classList.remove("open");document.body.classList.remove("modal")});
+  $("setDone").addEventListener("click",closeSheets);
+  $("finBtn").addEventListener("click",function(){$("finSheet").classList.add("open");$("finSheet").scrollTop=0;document.body.classList.add("modal")});
+  $("finDone").addEventListener("click",closeSheets);
 
   load();render();
   if(isReady())tab("H");else openSetup();
