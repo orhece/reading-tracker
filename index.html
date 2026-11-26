@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="app-version" content="3">
+<meta name="app-version" content="4">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>reading tracker</title>
 <meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
@@ -33,7 +33,7 @@ button,input,select{text-transform:capitalize}
 main{max-width:560px;margin:0 auto;padding:var(--top) 16px calc(110px + env(safe-area-inset-bottom))}
 h1{font-size:30px;line-height:1.15;margin:0 0 12px;font-weight:700}
 h1+.sub{margin:-10px 0 12px}
-.sub{color:var(--mute);margin:0 0 16px;font-size:15px}
+.sub{color:var(--mute);margin:0 0 16px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* setup form: grouped iOS rows, label left, value right */
 form{display:block;background:var(--card);border-radius:10px;overflow:hidden}
@@ -118,27 +118,39 @@ dd small,dt small{display:block;font-weight:400;color:var(--mute);font-size:12px
 .lcs .xl{fill:var(--ink);font-size:9px}
 
 /* log panel */
-.logp{text-align:center}
+.logp{text-align:left}
 .lphead{font-weight:700;margin:0 0 4px}
 .lpq{margin:0 0 4px;font-size:15px;color:var(--mute)}
-.lpbig{display:flex;justify-content:center;align-items:baseline;gap:4px;margin:6px 0}
-.lpbig input{width:5.5ch;font:inherit;font-size:3rem;font-weight:700;text-align:center;background:transparent;border:0;border-bottom:2px solid var(--line);border-radius:0;color:var(--accent-ink);padding:0}
+.lpbig{display:flex;justify-content:flex-start;align-items:baseline;gap:4px;margin:6px 0}
+.lpbig input{width:5.5ch;font:inherit;font-size:3rem;font-weight:700;text-align:left;background:transparent;border:0;border-bottom:2px solid var(--line);border-radius:0;color:var(--accent-ink);padding:0}
 .lpbig input.pctin{width:4.5ch}
 .lpbig span{font-size:1.6rem;color:var(--accent-ink)}
 .lpbtns{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
 .lpbtns button{padding:10px 0}
 .logp #lpgoal{margin-top:6px}
 .logp #lpsave{width:100%;margin-top:12px;padding:12px 0;font-size:17px}
+.logp #syncW{width:100%;margin-top:8px;padding:12px 0;font-size:17px}
 .logp #lpcancel{width:100%;margin-top:8px;padding:13px 0;font-size:17px}
 
 /* shelf */
 .bk{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:0.5px solid var(--line)}
 .bk:last-child{border-bottom:0}
-.bk .t{font-weight:600}
+.bkm{flex:1;min-width:0}
+.bk.cur .bkm{cursor:pointer}
+.bk .t{display:flex;align-items:center;gap:6px;min-width:0;font-weight:600}
+.tn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.chev{flex:none;font-style:normal;color:var(--mute);display:inline-block;transition:transform .15s}
+.chev.on,.fold.open .chev{transform:rotate(90deg)}
+.fold .chev{font-size:24px;font-weight:400;line-height:1}
+.fold{display:flex;justify-content:space-between;align-items:center;cursor:pointer;margin:0!important;-webkit-user-select:none;user-select:none}
+.fold.open{margin-bottom:8px!important}
+.setup{padding:2px 0 12px;border-bottom:0.5px solid var(--line)}
+.setup:last-child{border-bottom:0}
+.setup form,.setup #out:not(:empty){background:var(--bg)}
 .bk .s{color:var(--mute);font-size:14px}
 .bk .acts{display:flex;gap:6px;flex-shrink:0}
 .bk .acts button{padding:6px 12px;font-size:14px}
-.tag{display:inline-block;font-size:12px;font-weight:700;color:#000;background:var(--accent);border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+.tag{flex:none;display:inline-block;font-size:12px;font-weight:700;color:#000;background:var(--accent);border-radius:999px;padding:1px 8px}
 .tog{display:flex;flex-direction:row;align-items:center;gap:10px;font-size:15px;margin-top:14px;cursor:pointer}
 .tog input{width:20px;height:20px;accent-color:#34c759;flex:0 0 auto}
 textarea{font:inherit;font-size:13px;text-transform:none;width:100%;min-height:110px;margin-top:10px;background:var(--bg);color:var(--ink);border:0;border-radius:10px;padding:10px}
@@ -164,21 +176,19 @@ body.modal{overflow:hidden}
 .sheet .sbar{position:relative;display:flex;justify-content:space-between;align-items:center;min-height:36px;max-width:560px;margin:0 auto 6px;padding:0 16px}
 .sheet .sbar>b{position:absolute;left:50%;transform:translateX(-50%);font-size:17px}
 .sheet .inner{max-width:560px;margin:0 auto;padding:0 16px}
-#vH>#goLog{margin-top:12px}
 #toast{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 84px);max-width:528px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;background:#333;color:#fff;border-radius:12px;padding:6px 6px 6px 14px;min-height:44px;z-index:10;font-size:15px}
 #toast button{font:inherit;font-weight:600;text-transform:capitalize;color:var(--accent);background:none;border:0;padding:8px;cursor:pointer}
 </style>
 </head>
 <body>
 <main>
-  <div class="topbar"><span><button type="button" class="btn sm" id="setBtn" hidden>settings</button></span><span id="topSeg"></span></div>
+  <div class="topbar"><span><button type="button" class="btn sm" id="setBtn" hidden>settings</button></span><span><span id="topSeg"></span><button type="button" class="btn sm" id="newBtn" data-act="new" hidden>new book +</button></span></div>
   <h1>Reading tracker</h1>
   <p class="sub" id="bt" hidden></p>
   <nav class="tabs" role="tablist" aria-label="sections">
     <button type="button" role="tab" id="tabH" aria-controls="vH"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10.5L12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19z"/></svg>home</button>
     <button type="button" role="tab" id="tabT" aria-controls="vT"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M9 15l2 2 4-4"/></svg>today</button>
-    <button type="button" role="tab" id="tabL" aria-controls="vL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-12"/></svg>plan</button>
-    <button type="button" role="tab" id="tabP" aria-controls="vP"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></svg>setup</button>
+    <button type="button" role="tab" id="tabL" aria-controls="vL"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 20v-8M12 20V5M19 20v-12"/></svg>progress</button>
     <button type="button" role="tab" id="tabS" aria-controls="vS"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="4" height="16" rx="1"/><rect x="9.5" y="4" width="4" height="16" rx="1"/><path d="M15.6 5.3l3.2-.9 3.4 15.1-3.2.9z"/></svg>shelf</button>
   </nav>
 
@@ -191,17 +201,37 @@ body.modal{overflow:hidden}
     <button type="button" id="lpgoal"></button>
     <div class="lpbtns"><button type="button" data-d="-1">-1</button><button type="button" data-d="1">+1</button><button type="button" data-d="10">+10</button><button type="button" data-d="25">+25</button></div>
     <button type="button" id="lpsave">save progress</button>
+    <button type="button" id="syncW" hidden>update widget</button>
     <button type="button" id="lpcancel" hidden>cancel</button>
   </section>
   <section class="checkin" id="homeEmpty" hidden>
     <p class="hint" style="margin-top:0">finish setting up this book to start logging.</p>
-    <button type="button" class="btn wide" data-go="P">go to setup</button>
+    <button type="button" class="btn wide" data-go="P">set up this book</button>
   </section>
-  <button type="button" id="goLog">log your reading</button>
-  <button type="button" class="btn wide" id="syncW" hidden>update widget</button>
   </div>
 
-  <div id="vP" role="tabpanel" aria-labelledby="tabP">
+
+
+  <div id="vT" role="tabpanel" aria-labelledby="tabT" hidden>
+  <section class="checkin">
+    <div id="chk"></div>
+  </section>
+  </div>
+
+  <div id="vL" role="tabpanel" aria-labelledby="tabL" hidden>
+  <section class="plan" id="plan"></section>
+  </div>
+
+  <div id="vS" role="tabpanel" aria-labelledby="tabS" hidden>
+  <section class="checkin">
+    <h2>reading now</h2>
+    <div id="shNow"></div>
+  </section>
+  <section class="checkin" id="shDoneWrap" hidden>
+    <h2 class="fold" id="doneH"><span>finished <span class="count" id="doneN"></span></span><i class="chev">›</i></h2>
+    <div id="shDone" hidden></div>
+  </section>
+  <div id="setHold" hidden><div id="setupWrap" class="setup" hidden>
   <form id="f" onsubmit="return false" novalidate>
     <label class="full">Book title
       <input id="title" type="text" autocomplete="off" placeholder="e.g. the secret history"></label>
@@ -222,28 +252,7 @@ body.modal{overflow:hidden}
 
   <div id="msg" role="status" aria-live="polite"></div>
   <div id="out"></div>
-  </div>
-
-  <div id="vT" role="tabpanel" aria-labelledby="tabT" hidden>
-  <section class="checkin">
-    <div id="chk"></div>
-  </section>
-  </div>
-
-  <div id="vL" role="tabpanel" aria-labelledby="tabL" hidden>
-  <section class="plan" id="plan"></section>
-  </div>
-
-  <div id="vS" role="tabpanel" aria-labelledby="tabS" hidden>
-  <section class="checkin">
-    <h2>reading now</h2>
-    <div id="shNow"></div>
-    <button type="button" class="btn pri wide" data-act="new">start a new book</button>
-  </section>
-  <section class="checkin" id="shDoneWrap" hidden>
-    <h2>finished</h2>
-    <div id="shDone"></div>
-  </section>
+  </div></div>
   </div>
 </main>
 
@@ -471,7 +480,7 @@ body.modal{overflow:hidden}
   /* ---------- main render ---------- */
   function render(){ctx=null;render0();syncPanel();pull();renderShelf();$("topSeg").innerHTML=ctx?segHTML():"";$("homeEmpty").hidden=!!ctx;updTop()}
   function setupNeeded(text,btn){
-    $("chk").innerHTML='<p class="'+(btn?'warn':'hint')+'">'+text+'</p><button type="button" class="btn wide" data-go="P">'+(btn||"go to setup")+'</button>';
+    $("chk").innerHTML='<p class="'+(btn?'warn':'hint')+'">'+text+'</p><button type="button" class="btn wide" data-go="P">'+(btn||"set up this book")+'</button>';
   }
   var opOpen=false;
   document.addEventListener("toggle",function(e){if(e.target.classList&&e.target.classList.contains("opd"))opOpen=e.target.open},true);
@@ -479,7 +488,7 @@ body.modal{overflow:hidden}
     var out=$("out"),msg=$("msg"),chk=$("chk");
     out.innerHTML="";msg.textContent="";chk.innerHTML="";$("plan").innerHTML="";
     var t=$("title").value.trim();$("bt").textContent=t;$("bt").hidden=!t;
-    $("goLog").hidden=true;$("goLog").textContent="log your reading";$("syncW").hidden=true;
+    $("syncW").hidden=true;
     var total=num("total"),start=num("start"),end=num("end"),cur=num("cur"),ds=$("date").value;
     if([total,start,end,cur].some(isNaN)||!ds){setupNeeded("finish setting up this book to see today’s goal.");return}
 
@@ -520,7 +529,6 @@ body.modal{overflow:hidden}
       if(st&&st.bestK)h+='<dt>Best day</dt><dd>'+plural(st.best,'page')+' on '+sd(pd(st.bestK))+'</dd>';
       if(finD){var dfd=daysBetween(finD,target);h+='<dt>Vs. your target</dt><dd>'+(dfd>0?plural(dfd,'day')+' early':dfd===0?'right on time':plural(-dfd,'day')+' late')+'</dd>'}
       chk.innerHTML=h+'</dl><button type="button" class="btn pri wide" data-act="new">start your next book</button>';
-      $("goLog").hidden=false;$("goLog").textContent="see your reading chart";
       ctx={total:total,start:start,end:end,cur:cur,now:now,goalPg:end,done:true};
       base.done=true;base.perDay=0;base.finD=finD;drawPlan(base);
       return;
@@ -566,7 +574,6 @@ body.modal{overflow:hidden}
         '<dt>Story left overall</dt><dd>'+A(leftAll)+sm((pc?plural(leftAll,'page'):P(leftAll,total))+(hasT?' · about '+fmtMin(leftAll*m2):''))+'</dd>';
       chk.innerHTML=hh+'</dl>';
     }
-    $("goLog").hidden=false;
     ctx={total:total,start:start,end:end,cur:cur,now:now,goalPg:Math.min(end,Math.max(cur,start-1)+perDay),done:false};
     base.done=false;base.perDay=perDay;drawPlan(base);
   }
@@ -577,21 +584,38 @@ body.modal{overflow:hidden}
     if(!st)s="not set up yet";
     else if(st.done)s=st.finK?"finished "+sd(pd(st.finK))+(st.daysTaken?" · "+plural(st.daysTaken,"day"):"")+(st.avg!=null?" · "+st.avg.toFixed(1)+" pages/day":""):"finished";
     else s=st.storyPct+"% of the story"+(st.target?" · finish by "+sd(st.target):"");
-    return '<div class="bk"><div><div class="t">'+esc(name)+(isC?'<span class="tag">open</span>':'')+'</div><div class="s">'+s+'</div></div><div class="acts">'+
+    return '<div class="bk'+(isC?' cur" data-cur="1':'')+'"><div class="bkm"'+(isC?' data-setup="1"':'')+'><div class="t"><span class="tn">'+esc(name)+'</span>'+(isC?'<span class="tag">open</span><i class="chev'+(setupOpen?' on':'')+'">›</i>':'')+'</div><div class="s">'+s+'</div></div><div class="acts">'+
       (isC?'':'<button type="button" data-open="'+b.id+'">open</button>')+'<button type="button" data-del="'+b.id+'" aria-label="delete '+esc(name)+'">delete</button></div></div>';
   }
+  var setupOpen=false,doneOpen=false;
+  try{doneOpen=localStorage.getItem(KEY+".doneOpen")==="1"}catch(e){}
   function renderShelf(){
+    var wrap=$("setupWrap");
+    /* while typing in the book's setup, only refresh its row so the keyboard stays up */
+    if(wrap.contains(document.activeElement)){
+      var old=document.querySelector("#vS [data-cur]"),cb=curBook();
+      if(old&&cb){var tmp=document.createElement("div");tmp.innerHTML=row(cb);old.replaceWith(tmp.firstChild)}
+      return;
+    }
+    $("setHold").appendChild(wrap);
     var reading=[],done=[];
     shelf.books.forEach(function(b){var st=analyze(b);(st&&st.done?done:reading).push({b:b,k:st&&st.finK||""})});
     $("shNow").innerHTML=reading.length?reading.map(function(x){return row(x.b)}).join(""):'<p class="hint">nothing in progress right now.</p>';
     done.sort(function(a,b){return a.k<b.k?1:-1});
     $("shDoneWrap").hidden=!done.length;
     $("shDone").innerHTML=done.map(function(x){return row(x.b)}).join("");
+    $("doneN").textContent="("+done.length+")";
+    $("shDone").hidden=!doneOpen;$("doneH").classList.toggle("open",doneOpen);
+    var cr=document.querySelector("#vS [data-cur]");
+    if(cr&&setupOpen)cr.after(wrap);
+    wrap.hidden=!setupOpen||!cr;
     $("bkInfo").textContent=shelf.lastBackup?"last backup: "+longD(pd(shelf.lastBackup))+".":"no backup yet. a backup keeps your books safe if this browser’s data gets cleared or you switch phones.";
   }
   function isReady(){return ["total","start","end","cur","date"].every(function(i){return $(i).value!==""})&&!$("msg").textContent}
-  function openBook(id){pull();shelf.cur=id;push(curBook());render();save();tab(isReady()?"H":"P");window.scrollTo(0,0)}
-  function newBook(){pull();var b=blank();shelf.books.push(b);shelf.cur=b.id;push(b);render();save();tab("P");window.scrollTo(0,0);$("title").focus()}
+  function openSetup(){setupOpen=true;tab("S");renderShelf();var w=$("setupWrap");setTimeout(function(){w.scrollIntoView({block:"start"})},0)}
+  function toggleSetup(){setupOpen=!setupOpen;renderShelf()}
+  function openBook(id){pull();shelf.cur=id;push(curBook());render();save();if(isReady()){setupOpen=false;renderShelf();tab("H");window.scrollTo(0,0)}else openSetup()}
+  function newBook(){pull();var b=blank();shelf.books.push(b);shelf.cur=b.id;push(b);render();save();openSetup();$("title").focus()}
   function delBook(id){
     snap();
     shelf.books=shelf.books.filter(function(b){return b.id!==id});
@@ -716,6 +740,8 @@ body.modal{overflow:hidden}
     tab("H");window.scrollTo(0,0);
   });
   $("vS").addEventListener("click",function(e){
+    if(e.target.closest("[data-setup]")){toggleSetup();return}
+    if(e.target.closest("#doneH")){doneOpen=!doneOpen;try{localStorage.setItem(KEY+".doneOpen",doneOpen?"1":"0")}catch(x){}renderShelf();return}
     var b=e.target.closest("[data-open],[data-del]");if(!b)return;
     if(b.dataset.open)openBook(b.dataset.open);
     else if(armed(b,"sure?"))delBook(b.dataset.del);
@@ -730,16 +756,17 @@ body.modal{overflow:hidden}
     var sb=e.target.closest(".seg button[data-u]");if(sb){setUnit(sb.dataset.u);return}
     var b=e.target.closest("[data-ext],[data-go],[data-act]");if(!b)return;
     if(b.dataset.ext){$("date").value=ymd(addDays(today,Number(b.dataset.ext)-1));render();save();tab("T");window.scrollTo(0,0)}
-    else if(b.dataset.go){tab(b.dataset.go);window.scrollTo(0,0)}
+    else if(b.dataset.go){if(b.dataset.go==="P")openSetup();else{tab(b.dataset.go);window.scrollTo(0,0)}}
     else if(b.dataset.act==="new")newBook();
   });
 
-  var TABS={H:["tabH","vH"],T:["tabT","vT"],L:["tabL","vL"],P:["tabP","vP"],S:["tabS","vS"]};
+  var TABS={H:["tabH","vH"],T:["tabT","vT"],L:["tabL","vL"],S:["tabS","vS"]};
   var curTab="H";
   /* top bar: settings on home, pages/percent switch on the tabs that use it */
   function updTop(){
     $("setBtn").hidden=curTab!=="H";
     $("topSeg").hidden=!(curTab==="H"||curTab==="T"||curTab==="L");
+    $("newBtn").hidden=curTab!=="S";
   }
   function tab(n){
     curTab=n;updTop();
@@ -749,7 +776,6 @@ body.modal{overflow:hidden}
     });
   }
   Object.keys(TABS).forEach(function(k){$(TABS[k][0]).addEventListener("click",function(){tab(k)})});
-  $("goLog").addEventListener("click",function(){tab("L");window.scrollTo(0,0)});
 
   /* keep "today" current when the app is left open past midnight */
   function checkDay(){
@@ -766,7 +792,7 @@ body.modal{overflow:hidden}
   $("setDone").addEventListener("click",function(){$("setSheet").classList.remove("open");document.body.classList.remove("modal")});
 
   load();render();
-  tab(isReady()?"H":"P");
+  if(isReady())tab("H");else openSetup();
 })();
 </script>
 <script>
